@@ -7,10 +7,31 @@ and stays out of the way during calls. Personal use, no App Store.
 - [CONTEXT.md](CONTEXT.md) — the domain glossary; the source of truth for behavior.
 - [BUILD-PLAN.md](BUILD-PLAN.md) — architecture and milestones.
 
-## Install on your Mac
+## Install
 
-Requirements: macOS 14 (Sonoma) or newer, Apple Silicon or Intel, and the Xcode
-Command Line Tools (`xcode-select --install`) or Xcode 15+. No other dependencies.
+**Requirements:** macOS 14 (Sonoma) or newer.
+
+### Option 1 — Download (recommended)
+
+1. Grab the latest `Eye-Protect-<version>.dmg` from the
+   [Releases page](https://github.com/shubhamjain148/eye-protect/releases/latest).
+2. Open the DMG and drag **Eye-Protect** onto the **Applications** shortcut.
+3. First launch only: in Finder, **right-click Eye-Protect.app → Open → Open**.
+   macOS shows a warning because the app is not notarized (that needs a paid
+   Apple Developer account; this is a free, open-source personal tool you can
+   audit and build yourself). On macOS 15 you may instead need to click
+   **Open Anyway** under System Settings → Privacy & Security after the first
+   attempt. This happens once.
+
+An eye icon appears in the menu bar. The app adds itself to Login Items so it
+starts with your Mac (toggle in Settings → General → Launch at login).
+
+Every release includes a `.sha256` file; verify the download with
+`shasum -a 256 -c Eye-Protect-<version>.dmg.sha256`.
+
+### Option 2 — Build from source
+
+Needs the Xcode Command Line Tools (`xcode-select --install`) or Xcode 16+.
 
 ```bash
 git clone https://github.com/shubhamjain148/eye-protect.git
@@ -18,22 +39,17 @@ cd eye-protect
 scripts/install.sh
 ```
 
-The script runs the tests, builds a release binary, wraps it in `Eye-Protect.app`,
-installs it to `/Applications` (falling back to `~/Applications`), registers a
-LaunchAgent so it starts at login, and launches it. An eye icon appears in the
-menu bar. Re-run the script after pulling changes.
-
-The app is ad-hoc signed (no Developer ID, not notarized). Because you build it
-yourself, Gatekeeper does not object. Nothing leaves your machine: the app only
-reads local system state (mic/camera in use, frontmost app, sleep/lock events).
+Runs the tests, builds a release `.app`, installs it to `/Applications` (or
+`~/Applications`) and launches it. Re-run after pulling changes. No Gatekeeper
+warning, because you built it yourself.
 
 ### Uninstall
 
+Quit the app from the menu bar, then drag `Eye-Protect.app` from Applications to
+the Trash. It disappears from Login Items automatically. To forget settings:
+
 ```bash
-launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/com.shubham.eyeprotect.plist
-rm ~/Library/LaunchAgents/com.shubham.eyeprotect.plist
-rm -rf /Applications/Eye-Protect.app ~/Applications/Eye-Protect.app
-defaults delete com.shubham.eyeprotect   # optional: forget settings
+defaults delete com.shubham.eyeprotect
 ```
 
 ### First run
@@ -44,12 +60,25 @@ skipped, and which apps should always suppress breaks. Breaks are suppressed
 automatically while the microphone or camera is in use by any app (Zoom, Meet in a
 browser tab, etc.).
 
+Nothing leaves your machine: the app only reads local system state (mic/camera in
+use, frontmost app, sleep/lock events) and has no network code.
+
 ## Develop
 
 ```bash
 swift build          # debug build
 swift test           # scheduler unit tests (EyeProtectCoreTests)
 swift run            # run the debug binary (uses its own UserDefaults domain, "EyeProtect")
+scripts/build-app.sh # release .app bundle into dist/
+scripts/make-dmg.sh  # the .app plus a drag-to-Applications DMG into dist/
+```
+
+### Releasing
+
+Push a tag and GitHub Actions builds the DMG and attaches it to a release:
+
+```bash
+git tag v1.2.0 && git push origin v1.2.0
 ```
 
 The package has three targets:

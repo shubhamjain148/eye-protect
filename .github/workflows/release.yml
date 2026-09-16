@@ -1,0 +1,24 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # build number = commit count
+      - name: Run scheduler tests
+        run: swift test
+      - name: Build DMG
+        run: VERSION="${GITHUB_REF_NAME#v}" scripts/make-dmg.sh
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/Eye-Protect-*.dmg dist/Eye-Protect-*.dmg.sha256 \
+            --title "Eye-Protect $GITHUB_REF_NAME" \
+            --notes "Download the DMG, drag Eye-Protect to Applications, then right-click → Open the first time (the app is not notarized). See the README for details."
