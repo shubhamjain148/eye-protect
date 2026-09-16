@@ -21,4 +21,11 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" dist/Eye-Protect-*.dmg dist/Eye-Protect-*.dmg.sha256 \
             --title "Eye-Protect $GITHUB_REF_NAME" \
-            --notes "Download the DMG, drag Eye-Protect to Applications, then right-click → Open the first time (the app is not notarized). See the README for details."
+            --notes "$(cat <<'NOTES'
+**Install:** open the DMG and drag Eye-Protect to Applications.
+
+**First launch:** macOS will say *"Eye-Protect" Not Opened* because the app is not notarized. Click **Done**, then go to **System Settings → Privacy & Security**, scroll to Security and click **Open Anyway**. One time only. (macOS 14: right-click the app → Open.)
+
+Verify the download: `shasum -a 256 -c Eye-Protect-*.dmg.sha256`. See the README for details.
+NOTES
+)"

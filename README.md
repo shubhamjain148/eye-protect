@@ -16,12 +16,22 @@ and stays out of the way during calls. Personal use, no App Store.
 1. Grab the latest `Eye-Protect-<version>.dmg` from the
    [Releases page](https://github.com/shubhamjain148/eye-protect/releases/latest).
 2. Open the DMG and drag **Eye-Protect** onto the **Applications** shortcut.
-3. First launch only: in Finder, **right-click Eye-Protect.app → Open → Open**.
-   macOS shows a warning because the app is not notarized (that needs a paid
-   Apple Developer account; this is a free, open-source personal tool you can
-   audit and build yourself). On macOS 15 you may instead need to click
-   **Open Anyway** under System Settings → Privacy & Security after the first
-   attempt. This happens once.
+3. First launch only, macOS will refuse with *"Eye-Protect" Not Opened — Apple
+   could not verify…*. Click **Done** (not Move to Bin), then open
+   **System Settings → Privacy & Security**, scroll to the Security section and
+   click **Open Anyway** next to Eye-Protect. Confirm and authenticate. This
+   happens once.
+
+   On macOS 14 you can instead right-click the app → **Open** → **Open**.
+   From Terminal, the equivalent is:
+
+   ```bash
+   xattr -d com.apple.quarantine /Applications/Eye-Protect.app
+   ```
+
+   The warning appears because the app is not notarized (that needs a paid Apple
+   Developer account); this is a free, open-source tool you can audit and build
+   yourself, and building from source skips the warning entirely.
 
 An eye icon appears in the menu bar. The app adds itself to Login Items so it
 starts with your Mac (toggle in Settings → General → Launch at login).
