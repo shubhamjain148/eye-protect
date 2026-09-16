@@ -1,0 +1,14 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj
+*.xcworkspace
+
+# Install script staging
+dist/
+
+# Local tooling / editor state
+.claude/
+.expect/
+.DS_Store
